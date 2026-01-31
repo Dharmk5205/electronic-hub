@@ -1,0 +1,114 @@
+<!-- Save as cart.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cart Page</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- Header -->
+
+  <section class="about-hero section-m1">
+    <h1>#cart</h1>
+    <p>Cart items!</p>
+  </section>
+
+  <!-- Cart Table -->
+  <section id="cart" class="section-p1">
+    <table width="100%">
+      <thead>
+        <tr>
+          <td>Remove</td>
+          <td>Image</td>
+          <td>Product</td>
+          <td>Price</td>
+          <td>Quantity</td>
+          <td>Subtotal</td>
+        </tr>
+      </thead>
+      <tbody id="cart-body"></tbody>
+    </table>
+  </section>
+
+  <!-- Cart Total -->
+  <section id="cart-add" class="section-p1">
+    <div id="subtotal">
+      <h3>Cart Totals</h3>
+      <table>
+        <tr>
+          <td>Cart Subtotal</td>
+          <td id="cart-subtotal">$0.00</td>
+        </tr>
+        <tr>
+          <td>Shipping</td>
+          <td>Free</td>
+        </tr>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong id="total-price">$0.00</strong></td>
+        </tr>
+      </table>
+      <button class="normal" onclick="proceedToCheckout()">Proceed to Checkout</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+
+  <!-- JavaScript -->
+  <script>
+    function loadCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const tbody = document.getElementById('cart-body');
+      const subtotalElem = document.getElementById('cart-subtotal');
+      const totalElem = document.getElementById('total-price');
+      let subtotal = 0;
+
+      tbody.innerHTML = '';
+
+      cart.forEach((item, index) => {
+        const itemSubtotal = item.price * item.quantity;
+        subtotal += itemSubtotal;
+
+        tbody.innerHTML += `
+          <tr>
+            <td><button onclick="removeFromCart(${index})">Remove</button></td>
+            <td><img src="${item.image}" width="50" /></td>
+            <td>${item.name}</td>
+            <td>$${item.price.toFixed(2)}</td>
+            <td>${item.quantity}</td>
+            <td>$${itemSubtotal.toFixed(2)}</td>
+          </tr>`;
+      });
+
+      subtotalElem.textContent = `$${subtotal.toFixed(2)}`;
+      totalElem.textContent = `$${subtotal.toFixed(2)}`;
+    }
+
+    function removeFromCart(index) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      loadCart();
+    }
+
+    function proceedToCheckout() {
+      const user = localStorage.getItem('loggedInUser');
+      if (!user) {
+        alert("Please log in to continue.");
+        window.location.href = 'login.html';
+        return;
+      }
+
+      alert("Thank you for your purchase! Payment will be made by cash on delivery.");
+      localStorage.removeItem('cart');
+      loadCart();
+    }
+
+    window.onload = loadCart;
+  </script>
+</body>
+</html>
